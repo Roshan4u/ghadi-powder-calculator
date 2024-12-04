@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghadi Powder Scheme Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .calculator {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .calculator h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .item:last-child {
+            border-bottom: none;
+        }
+        .item label {
+            flex: 1;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .item input {
+            width: 80px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .discount {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .discount input {
+            width: 100px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .total {
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 20px;
+            text-align: center;
+            color: #28a745;
+            background: #e9ffe9;
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #28a745;
+        }
+        .slab-display {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .slab-button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>Ghadi Powder Scheme Calculator</h2>
+        <div class="items" id="items"></div>
+
+        <!-- Discount Field -->
+        <div class="discount">
+            <label for="discount">Cash Discount (%):</label>
+            <input type="number" id="discount" min="0" max="100" placeholder="Enter discount">
+        </div>
+
+        <!-- Total Display -->
+        <div class="total">
+            Total: RS <span id="total">0.00</span>
+        </div>
+
+        <!-- Slab Display -->
+        <div class="slab-display" id="slab-display"></div>
+    </div>
+
+    <script>
+        // Predefined items with rates
+        const items = [
+            { name: "Powder 5kg", rate: 1920 },
+            { name: "Powder 4kg", rate: 1562 },
+            { name: "Plain 4kg", rate: 1116 },
+            { name: "Powder 3kg", rate: 1720 },
+            { name: "Powder 1kg", rate: 1557 },
+            { name: "Powder 500gm", rate: 1271 },
+            { name: "Powder 10rs", rate: 630 },
+            { name: "Powder 5rs", rate: 427 },
+        ];
+
+        const slabs = [
+            { amount: 3000, freePcs: 2 },
+            { amount: 7000, freePcs: 6 },
+            { amount: 15000, freePcs: 13 },
+            { amount: 35000, freePcs: 34 },
+            { amount: 65000, freePcs: 72 },
+            { amount: 125000, freePcs: 150 },
+        ];
+
+        const itemsContainer = document.getElementById('items');
+        const totalElement = document.getElementById('total');
+        const discountElement = document.getElementById('discount');
+        const slabDisplay = document.getElementById('slab-display');
+
+        // Create input fields for each item
+        items.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `
+                <label>${index + 1}. ${item.name} (Rate: RS ${item.rate})</label>
+                <input type="number" id="quantity${index}" min="0" placeholder="Qty" oninput="calculateTotal()">
+            `;
+            itemsContainer.appendChild(div);
+        });
+
+        // Calculate total
+        function calculateTotal() {
+            let total = 0;
+
+            // Calculate item totals
+            items.forEach((item, index) => {
+                const quantity = document.getElementById(`quantity${index}`).value;
+                total += item.rate * (parseInt(quantity) || 0);
+            });
+
+            // Apply discount percentage
+            const discountPercentage = parseFloat(discountElement.value) || 0;
+            if (discountPercentage >= 0 && discountPercentage <= 100) {
+                total = total - (total * discountPercentage / 100);
+            }
+
+            // Update total display
+            totalElement.textContent = total.toFixed(2);
+
+            // Determine applicable slab
+            displaySlab(total);
+        }
+
+        // Display applicable slab
+        function displaySlab(total) {
+            let applicableSlab = null;
+
+            for (let i = slabs.length - 1; i >= 0; i--) {
+                if (total >= slabs[i].amount) {
+                    applicableSlab = slabs[i];
+                    break;
+                }
+            }
+
+            // Update slab display
+            if (applicableSlab) {
+                slabDisplay.innerHTML = `
+                    <button class="slab-button">
+                        Slab: RS ${applicableSlab.amount} | Free Pcs: ${applicableSlab.freePcs}
+                    </button>
+                `;
+            } else {
+                slabDisplay.innerHTML = `
+                    <button class="slab-button" style="background-color: #dc3545;">
+                        No Free Pcs Applicable
+                    </button>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
