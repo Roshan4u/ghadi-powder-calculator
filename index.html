@@ -13,7 +13,7 @@
         .calculator {
             max-width: 600px;
             margin: auto;
-            padding: 20px;
+            padding: 10px;
             background: #fff;
             border: 1px solid #ccc;
             border-radius: 8px;
@@ -27,10 +27,11 @@
         }
         .item {
             display: flex;
+            #font-weight: bold;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding: 10px;
+            margin-bottom: 10px;
+            padding: 0.8px;
             border-bottom: 1px solid #ddd;
         }
         .item:last-child {
@@ -95,7 +96,7 @@
         <!-- Discount Field -->
         <div class="discount">
             <label for="discount">Cash Discount (%):</label>
-            <input type="number" id="discount" min="0" max="100" placeholder="Enter discount">
+            <input type="number" id="discount" min="0" max="100" placeholder="Enter discount" oninput="calculateTotal()">
         </div>
 
         <!-- Total Display -->
@@ -113,7 +114,7 @@
             { name: "Powder 5kg", rate: 1920 },
             { name: "Powder 4kg", rate: 1562 },
             { name: "Plain 4kg", rate: 1116 },
-            { name: "Powder 3kg", rate: 1720 },
+            { name: "Powder 3kg", rate: 1716 },
             { name: "Powder 1kg", rate: 1557 },
             { name: "Powder 500gm", rate: 1271 },
             { name: "Powder 10rs", rate: 630 },
@@ -154,10 +155,13 @@
                 total += item.rate * (parseInt(quantity) || 0);
             });
 
-            // Apply discount percentage
+            // Parse and apply discount
             const discountPercentage = parseFloat(discountElement.value) || 0;
             if (discountPercentage >= 0 && discountPercentage <= 100) {
-                total = total - (total * discountPercentage / 100);
+                const discountAmount = total * (discountPercentage / 100);
+                total -= discountAmount;
+            } else {
+                alert('Please enter a valid discount between 0 and 100.');
             }
 
             // Update total display
